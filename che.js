@@ -120,90 +120,82 @@ async function loadData() {
     const querySnapshot = await getDocs(collection(db, "events"));
     querySnapshot.forEach((docSnap) => {
         const data = docSnap.data();
-      document.getElementById("saveEventBtn").addEventListener("click", async function() {
-    eTitle = document.getElementById("eventTitle");
-    eContent = document.getElementById("eventContent");
+        
+        // 直接在這裡產生卡片 DOM
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.id = docSnap.id; // 綁定雲端 ID
 
-    document.getElementById("enterEvent").style.display = "none";
+        const title = document.createElement("h2");
+        const content = document.createElement("p");
+        const moreinfo = document.createElement("p");
+        const finish = document.createElement("input");
+        finish.type = "checkbox";
+        const colorLabel = document.createElement("label");
+        colorLabel.textContent = "選個顏色:D";
+        const cardColor = document.createElement("input");
+        cardColor.type = "color";
+        
+        const changeinfo = document.createElement("button");
+        changeinfo.textContent = "改些資訊";
+        
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "刪除";
+        
+        removeBtn.addEventListener("click", async function() {
+            if (card.dataset.id) {
+                await deleteDoc(doc(db, "events", card.dataset.id));
+            }
+            card.remove();
+        }, { once: true });
 
-  const docRef = await addDoc(collection(db, "events"), {
-    title: eTitle.value,
-    content: eContent.value
-  });
+        changeinfo.addEventListener("click", function() {
+            document.getElementById("changeinfo-modal").style.display = "flex";
+            document.getElementById("changeinfoTitle").value = title.textContent;
+            document.getElementById("changeinfoContent").value = content.textContent;
 
+            const saveBtn = document.getElementById("saveChangeinfoBtn");
+            saveBtn.addEventListener("click", async function() {
+                const newTitle = document.getElementById("changeinfoTitle").value;
+                const newContent = document.getElementById("changeinfoContent").value;
+                const moreinfomation = document.getElementById("moreinfoContent").value;
 
-    const card = document.createElement("div");
-    card.className = "card";
-    card.dataset.id = docRef.id;
-    const title = document.createElement("h2");
-    const content = document.createElement("p");
-    const moreinfo = document.createElement("p");
-    const finish = document.createElement("input");
-    finish.type = "checkbox";
-    const colorLabel = document.createElement("label");
-    colorLabel.textContent = "選個顏色:D";
-    const cardColor = document.createElement("input");
-    cardColor.type = "color";
-    const changeinfo = document.createElement("button");
-    changeinfo.textContent = "改些資訊";
-    const removeBtn = document.createElement("button");
-    removeBtn.textContent = "刪除";
-    removeBtn.addEventListener("click", async function() {
-      if (card.dataset.id) {
-        await deleteDoc(doc(db, "events", card.dataset.id));
-    }
-        card.remove();
-    },{ once: true });
+                if (card.dataset.id) {
+                    await updateDoc(doc(db, "events", card.dataset.id), {
+                        title: newTitle,
+                        content: newContent,
+                        moreinfo: moreinfomation
+                    });
+                }
+                title.textContent = newTitle;
+                content.textContent = newContent;
+                moreinfo.textContent = "補充: " + moreinfomation;
 
-changeinfo.addEventListener("click", function() {
-  document.getElementById("changeinfo-modal").style.display = "flex";
-  document.getElementById("changeinfoTitle").value = title.textContent;
-  document.getElementById("changeinfoContent").value = content.textContent;
+                document.getElementById("changeinfo-modal").style.display = "none";
+            }, { once: true });
+        });
 
-  const saveBtn = document.getElementById("saveChangeinfoBtn");
-  saveBtn.addEventListener("click",  async function() {
+        cardColor.addEventListener("input", function() {
+            card.style.backgroundColor = cardColor.value;
+        });
 
-    const newTitle = document.getElementById("changeinfoTitle").value;
-    const newContent = document.getElementById("changeinfoContent").value;
-    const moreinfomation = document.getElementById("moreinfoContent").value;
+        // 將抓下來的資料填入卡片中
+        title.textContent = data.title;
+        content.textContent = data.content;
+        moreinfo.textContent = data.moreinfo ? "補充: " + data.moreinfo : "More info: ";
+        cardColor.value = "#ffffff";
 
-    if (card.dataset.id) {
-    await updateDoc(doc(db, "events", card.dataset.id), {
-        title: newTitle,
-        content: newContent,
-        moreinfo: moreinfomation
-    });
-  }
-    title.textContent = newTitle;
-    content.textContent = newContent;
-    moreinfo.textContent = "補充: " + moreinfomation;
+        card.appendChild(title);
+        card.appendChild(content);
+        card.appendChild(moreinfo);
+        card.appendChild(finish);
+        colorLabel.appendChild(cardColor);
+        card.appendChild(colorLabel);
+        card.appendChild(changeinfo);
+        card.appendChild(removeBtn);
 
-    document.getElementById("changeinfo-modal").style.display = "none";
-  }, { once: true });
-});
-    cardColor.addEventListener("input", function() {
-        card.style.backgroundColor = cardColor.value;
-    });
-
-    title.textContent = eTitle.value;
-    content.textContent = eContent.value;
-    moreinfo.textContent = "More info: ";
-    cardColor.value = "#ffffff";
-
-    card.appendChild(title);
-    card.appendChild(content);
-    card.appendChild(moreinfo);
-    card.appendChild(finish);
-    colorLabel.appendChild(cardColor);
-    card.appendChild(colorLabel);
-    card.appendChild(changeinfo);
-    card.appendChild(removeBtn);
-
-    document.getElementById("allText").appendChild(card);
-
-
-});
-       
+        document.getElementById("allText").appendChild(card);
     });
 }
+
 loadData();
