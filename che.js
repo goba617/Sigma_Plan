@@ -1,4 +1,20 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { 
+  getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+const firebaseConfig = {
+  apiKey: "AIzaSyCdhEarcKX1C51IdMHqV-t8Ka7SDM702ss",
+  authDomain: "sigma-4eb67.firebaseapp.com",
+  projectId: "sigma-4eb67",
+  storageBucket: "sigma-4eb67.firebasestorage.app",
+  messagingSenderId: "246620482813",
+  appId: "1:246620482813:web:6ed3b69f0619654a446294",
+  measurementId: "G-3JPVTVEKQ4"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 let eTitle = document.getElementById("eventTitle");
 let eContent = document.getElementById("eventContent");
