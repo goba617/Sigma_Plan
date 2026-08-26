@@ -41,8 +41,9 @@ document.getElementById("saveEventBtn").addEventListener("click", async function
 
   const docRef = await addDoc(collection(db, "events"), {
     title: eTitle.value,
-    content: eContent.value
-  });
+    content: eContent.value,
+    order: Date.now()
+});
 
 
     const card = document.createElement("div");
@@ -199,3 +200,19 @@ async function loadData() {
 }
 
 loadData();
+
+const container = document.getElementById("allText");
+new Sortable(container, {
+    animation: 150,
+    onEnd: async function () {
+        const cards = container.querySelectorAll(".card");
+
+        cards.forEach(async (cardEl, index) => {
+            if (cardEl.dataset.id) {
+                await updateDoc(doc(db, "events", cardEl.dataset.id), {
+                    order: index 
+                });
+            }
+        });
+    }
+});
