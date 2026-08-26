@@ -118,7 +118,8 @@ changeinfo.addEventListener("click", function() {
 
 });
 async function loadData() {
-    const querySnapshot = await getDocs(collection(db, "events"));
+  const q = query(collection(db, "events"), orderBy("order", "asc"));
+  const querySnapshot = await getDocs(q);
     querySnapshot.forEach((docSnap) => {
         const data = docSnap.data();
         
